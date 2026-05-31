@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { APP_VERSION } from "@/lib/version";
 
 const I = (d: ReactNode) => (
   <svg className="nav-ico w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -54,6 +55,7 @@ export default function Sidebar({ email }: { email: string }) {
           <div>
             <p className="font-extrabold text-[15px] leading-tight">Studio Manager</p>
             <p className="text-[11px] text-ink/50">Dance &amp; Art · Sharjah</p>
+            <p className="text-[10px] text-ink/35 font-mono mt-0.5">v{APP_VERSION}</p>
           </div>
         </div>
       </div>
