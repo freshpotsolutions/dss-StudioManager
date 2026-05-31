@@ -1,7 +1,8 @@
 import { getTeachers, getBatches } from "@/lib/queries";
 import { tint, initials } from "@/lib/ui";
-import { addTeacher } from "@/app/(app)/actions";
+import { addTeacher, updateTeacher, deleteTeacher } from "@/app/(app)/actions";
 import FormDialog, { fieldClass, labelClass } from "@/components/FormDialog";
+import ConfirmDelete from "@/components/ConfirmDelete";
 
 export default async function TeachersPage() {
   const [teachers, batches] = await Promise.all([getTeachers(), getBatches()]);
@@ -47,6 +48,20 @@ export default async function TeachersPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {assigned.length ? assigned.map((b) => <span key={b.id} className={`px-2.5 py-1 ${c.bg} ${c.text} rounded-full text-xs font-semibold`}>{b.course?.name} · {b.code}</span>) : <span className="text-xs text-ink/30">None yet</span>}
                   </div>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <FormDialog title="Edit Teacher" action={updateTeacher} submitLabel="Update Teacher"
+                    triggerClass="flex-1 py-2 bg-cream hover:bg-sand rounded-full text-xs font-bold transition" trigger="Edit">
+                    <input type="hidden" name="id" defaultValue={t.id} />
+                    <div><label className={labelClass}>Full Name</label><input name="name" required defaultValue={t.name} className={fieldClass} /></div>
+                    <div><label className={labelClass}>Specialization</label><input name="specialization" defaultValue={t.specialization ?? ""} className={fieldClass} /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className={labelClass}>Phone</label><input name="phone" defaultValue={t.phone ?? ""} className={fieldClass} /></div>
+                      <div><label className={labelClass}>Email</label><input name="email" type="email" defaultValue={t.email ?? ""} className={fieldClass} /></div>
+                    </div>
+                  </FormDialog>
+                  <ConfirmDelete action={deleteTeacher} id={t.id} label={t.name} note="Their batches will be unassigned (not deleted)."
+                    triggerClass="px-3 py-2 bg-rose-50 text-rose-600 rounded-full text-xs font-bold hover:bg-rose-100 transition" trigger="Delete" />
                 </div>
               </div>
             </div>

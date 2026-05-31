@@ -1,7 +1,9 @@
 import { getLeads } from "@/lib/queries";
 import { shortDate } from "@/lib/ui";
-import { addLead } from "@/app/(app)/actions";
+import { addLead, updateLead, deleteLead } from "@/app/(app)/actions";
 import FormDialog, { fieldClass, labelClass } from "@/components/FormDialog";
+import ConfirmDelete from "@/components/ConfirmDelete";
+import LeadStage from "@/components/LeadStage";
 import type { Lead } from "@/lib/types";
 
 const STAGES: { key: Lead["stage"]; label: string; chip: string }[] = [
@@ -61,6 +63,24 @@ export default async function LeadsPage() {
                   <p className="text-xs text-ink/50 mt-0.5">{l.interest ?? "—"}{l.source ? ` · ${l.source}` : ""}</p>
                   {l.phone && <p className="text-[11px] text-ink/40 mt-2">📞 {l.phone}</p>}
                   {l.trial_date && <span className="inline-block mt-2 text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">Trial · {shortDate(l.trial_date)}</span>}
+                  <div className="mt-3"><LeadStage id={l.id} stage={l.stage} /></div>
+                  <div className="flex items-center gap-3 mt-2">
+                    <FormDialog title="Edit Lead" action={updateLead} submitLabel="Update Lead"
+                      triggerClass="text-ink/60 hover:underline text-[11px] font-bold" trigger="Edit">
+                      <input type="hidden" name="id" defaultValue={l.id} />
+                      <div><label className={labelClass}>Full Name</label><input name="name" required defaultValue={l.name} className={fieldClass} /></div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div><label className={labelClass}>Phone</label><input name="phone" defaultValue={l.phone ?? ""} className={fieldClass} /></div>
+                        <div><label className={labelClass}>Interested In</label><input name="interest" defaultValue={l.interest ?? ""} className={fieldClass} /></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div><label className={labelClass}>Source</label><select name="source" defaultValue={l.source ?? "Walk-in"} className={fieldClass}><option>Walk-in</option><option>Instagram</option><option>Referral</option><option>Website</option><option>Google</option></select></div>
+                        <div><label className={labelClass}>Stage</label><select name="stage" defaultValue={l.stage} className={fieldClass}><option value="new">New Enquiry</option><option value="trial_booked">Trial Booked</option><option value="attended">Attended Trial</option><option value="enrolled">Enrolled</option></select></div>
+                      </div>
+                      <div><label className={labelClass}>Trial Date</label><input name="trial_date" type="date" defaultValue={l.trial_date ?? ""} className={fieldClass} /></div>
+                    </FormDialog>
+                    <ConfirmDelete action={deleteLead} id={l.id} label={l.name} triggerClass="text-rose-600 hover:underline text-[11px] font-bold" />
+                  </div>
                 </div>
               ))}
               {!counts(stage.key) && <p className="text-xs text-ink/30 px-1 py-3">None</p>}

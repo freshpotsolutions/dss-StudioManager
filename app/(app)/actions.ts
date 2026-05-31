@@ -221,3 +221,107 @@ export async function assignBatch(fd: FormData) {
   });
   revalidateAll();
 }
+
+// ---------------------------------------------------------------------------
+// Edit (update) actions
+// ---------------------------------------------------------------------------
+export async function updateStudent(fd: FormData) {
+  const s = await createClient();
+  await s.from("students").update({
+    name: str(fd, "name"),
+    email: str(fd, "email") || null,
+    phone: str(fd, "phone") || null,
+    parent_name: str(fd, "parent_name") || null,
+    parent_phone: str(fd, "parent_phone") || null,
+    relationship: str(fd, "relationship") || null,
+  }).eq("id", str(fd, "id"));
+  revalidateAll();
+}
+
+export async function updateTeacher(fd: FormData) {
+  const s = await createClient();
+  await s.from("teachers").update({
+    name: str(fd, "name"),
+    specialization: str(fd, "specialization") || null,
+    phone: str(fd, "phone") || null,
+    email: str(fd, "email") || null,
+  }).eq("id", str(fd, "id"));
+  revalidateAll();
+}
+
+export async function updateCourse(fd: FormData) {
+  const s = await createClient();
+  await s.from("courses").update({
+    name: str(fd, "name"),
+    description: str(fd, "description") || null,
+    icon: str(fd, "icon") || "🎨",
+  }).eq("id", str(fd, "id"));
+  revalidateAll();
+}
+
+export async function updateBatch(fd: FormData) {
+  const s = await createClient();
+  await s.from("batches").update({
+    name: str(fd, "name") || "Batch",
+    course_id: str(fd, "course_id") || null,
+    teacher_id: str(fd, "teacher_id") || null,
+    days: str(fd, "days") ? str(fd, "days").split(",").map((d) => d.trim()) : [],
+    time_label: str(fd, "time_label") || null,
+    clock: str(fd, "clock") || null,
+    sessions_total: Number(str(fd, "sessions_total") || 8),
+    hours_per_session: Number(str(fd, "hours_per_session") || 1),
+    fee: Number(str(fd, "fee") || 0),
+    capacity: Number(str(fd, "capacity") || 20),
+    status: str(fd, "status") || "active",
+  }).eq("id", str(fd, "id"));
+  revalidateAll();
+}
+
+export async function updateLead(fd: FormData) {
+  const s = await createClient();
+  await s.from("leads").update({
+    name: str(fd, "name"),
+    phone: str(fd, "phone") || null,
+    interest: str(fd, "interest") || null,
+    source: str(fd, "source") || "Walk-in",
+    stage: (str(fd, "stage") as any) || "new",
+    trial_date: str(fd, "trial_date") || null,
+  }).eq("id", str(fd, "id"));
+  revalidateAll();
+}
+
+// Lightweight stage move from the Kanban board (called directly from a client component).
+export async function moveLead(leadId: string, stage: string) {
+  const s = await createClient();
+  await s.from("leads").update({ stage }).eq("id", leadId);
+  revalidateAll();
+}
+
+// ---------------------------------------------------------------------------
+// Delete actions
+// ---------------------------------------------------------------------------
+export async function deleteStudent(fd: FormData) {
+  const s = await createClient();
+  await s.from("students").delete().eq("id", str(fd, "id"));
+  revalidateAll();
+}
+export async function deleteTeacher(fd: FormData) {
+  const s = await createClient();
+  await s.from("teachers").delete().eq("id", str(fd, "id"));
+  revalidateAll();
+}
+export async function deleteCourse(fd: FormData) {
+  const s = await createClient();
+  await s.from("courses").delete().eq("id", str(fd, "id"));
+  revalidateAll();
+}
+export async function deleteBatch(fd: FormData) {
+  const s = await createClient();
+  await s.from("batches").delete().eq("id", str(fd, "id"));
+  revalidateAll();
+}
+export async function deleteLead(fd: FormData) {
+  const s = await createClient();
+  await s.from("leads").delete().eq("id", str(fd, "id"));
+  revalidateAll();
+}

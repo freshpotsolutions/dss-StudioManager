@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getStudents } from "@/lib/queries";
 import { tint, initials } from "@/lib/ui";
-import { addStudent } from "@/app/(app)/actions";
+import { addStudent, updateStudent, deleteStudent } from "@/app/(app)/actions";
 import FormDialog, { fieldClass, labelClass } from "@/components/FormDialog";
+import ConfirmDelete from "@/components/ConfirmDelete";
 
 export default async function StudentsPage() {
   const students = await getStudents();
@@ -72,7 +73,26 @@ export default async function StudentsPage() {
                         : <span className="px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold">Paid</span>}
                   </td>
                   <td className="px-5 py-4">
-                    <Link href={`/students/${s.id}`} className="text-gold-600 hover:underline text-xs font-bold">Profile</Link>
+                    <div className="flex items-center gap-3">
+                      <Link href={`/students/${s.id}`} className="text-gold-600 hover:underline text-xs font-bold">Profile</Link>
+                      <FormDialog title="Edit Student" action={updateStudent} submitLabel="Update Student"
+                        triggerClass="text-ink/60 hover:underline text-xs font-bold" trigger="Edit">
+                        <input type="hidden" name="id" defaultValue={s.id} />
+                        <div><label className={labelClass}>Full Name</label><input name="name" required defaultValue={s.name} className={fieldClass} /></div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className={labelClass}>Phone</label><input name="phone" defaultValue={s.phone ?? ""} className={fieldClass} /></div>
+                          <div><label className={labelClass}>Email</label><input name="email" type="email" defaultValue={s.email ?? ""} className={fieldClass} /></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className={labelClass}>Guardian Name</label><input name="parent_name" defaultValue={s.parent_name ?? ""} className={fieldClass} /></div>
+                          <div><label className={labelClass}>Relationship</label>
+                            <select name="relationship" defaultValue={s.relationship ?? "Father"} className={fieldClass}><option>Father</option><option>Mother</option><option>Guardian</option><option>Other</option></select>
+                          </div>
+                        </div>
+                        <div><label className={labelClass}>Parent Mobile</label><input name="parent_phone" defaultValue={s.parent_phone ?? ""} className={fieldClass} /></div>
+                      </FormDialog>
+                      <ConfirmDelete action={deleteStudent} id={s.id} label={s.name} note="Removes the student and all their enrollments, attendance and payments." />
+                    </div>
                   </td>
                 </tr>
               );
